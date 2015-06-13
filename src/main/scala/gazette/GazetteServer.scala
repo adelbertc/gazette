@@ -1,11 +1,10 @@
 package gazette
 
-import argonaut.Argonaut._
+import argonaut.Argonaut.ToJsonIdentity
 
 import doobie.contrib.h2.h2transactor.H2Transactor
-import doobie.contrib.h2.h2types._
-import doobie.imports._
-import doobie.util.composite._
+import doobie.contrib.h2.h2types.unliftedStringArrayType
+import doobie.imports.{ConnectionIO, Transactor, toMoreConnectionIOOps, toSqlInterpolator}
 
 import java.sql.Date
 import java.text.SimpleDateFormat
