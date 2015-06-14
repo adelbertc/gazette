@@ -39,7 +39,7 @@ object Cli extends TaskApp {
   val todaysMenu: Task[String] = currentDate.map(menu)
 
   val createTodo: GazetteAction[Option[Todo]] =
-    (gprompt("Event name") |@| gprompt("Category") |@| gprompt("Due date(yyyy-MM-dd) (optional)") |@| gprompt("Tags, comma separated")) {
+    (gprompt("Event name") |@| gprompt("Category") |@| gprompt("Due date (yyyy-MM-dd) (optional)") |@| gprompt("Tags, comma separated")) {
       case (e, c, d, t) =>
         val ts  =  t.split(",").toList.map(_.trim).filter(_.nonEmpty)
         if (d.isEmpty) Some(Todo(e, c, None, ts))
