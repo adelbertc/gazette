@@ -32,7 +32,7 @@ available under the MPL 2.0 (Mozilla Public License) or under the EPL 1.0
 (Eclipse Public License). An original copy of the license agreement can
 be found at: http://www.h2database.com/html/license.html
 
-Argonaut, Macro Paradise, Scalaz, and scala-optparse-applicative are
+Argonaut, Macro Paradise, Scalaz, Scodec, and scala-optparse-applicative are
 licensed under BSD-style licenses - see: http://opensource.org/licenses/BSD-3-Clause.
 
 Kiama, used by scala-optparse-applicative, is licensed under GNU Lesser GPL v3,

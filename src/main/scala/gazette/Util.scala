@@ -19,6 +19,9 @@ object Util {
 
   def parseDate(s: String): Option[Date] = Disjunction.fromTryCatchNonFatal(Date.valueOf(s)).toOption
 
+  def parseCsv(s: String): List[String] =
+    s.split(",").toList.map(_.trim).filter(_.nonEmpty)
+
   def putStr(s: String): Task[Unit] = Task.delay(print(s))
 
   def gputStr(s: String): GazetteAction[Unit] = Applicative[GazetteAction].point(print(s))

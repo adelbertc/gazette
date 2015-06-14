@@ -41,7 +41,7 @@ object Cli extends TaskApp {
   val createTodo: GazetteAction[Option[Todo]] =
     (gprompt("Event name") |@| gprompt("Category") |@| gprompt("Due date (yyyy-MM-dd) (optional)") |@| gprompt("Tags, comma separated")) {
       case (e, c, d, t) =>
-        val ts  =  t.split(",").toList.map(_.trim).filter(_.nonEmpty)
+        val ts  =  Util.parseCsv(t)
         if (d.isEmpty) Some(Todo(e, c, None, ts))
         else parseDate(d).map(date => Todo(e, c, Some(date), ts))
     }

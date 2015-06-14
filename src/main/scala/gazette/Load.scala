@@ -6,6 +6,7 @@ import atto.parser.combinator._
 import atto.parser.text._
 import atto.syntax.parser._
 
+import java.io.FileInputStream
 import java.sql.Date
 
 import scalaz.{Applicative, Kleisli}
@@ -14,6 +15,8 @@ import scalaz.std.list._
 import scalaz.stream.io
 import scalaz.syntax.apply._
 import scalaz.syntax.traverse._
+
+import scodec.stream.decode
 
 object Load {
   private def until1(c: Char): Parser[String] = takeWhile1(_ != c)
@@ -34,6 +37,11 @@ object Load {
 
   private def todoLine(sep: Char, tagSep: Char): Parser[Todo] =
     ((until1(sep) <* char(sep))|@| (until1(sep) <* char(sep)) |@| (date <* char(sep)) |@| tags(tagSep))(Todo.apply)
+
+  val binary: Kleisli[Task, String, List[Todo]] =
+    Kleisli { path =>
+      decode.many(Todo.todoCodec).decodeMmap(new FileInputStream(path).getChannel).runLog.map(_.toList)
+    }
 
   def separatedBy(sep: Char, tagSep: Char): Kleisli[Task, String, List[Todo]] =
     Kleisli { path =>
