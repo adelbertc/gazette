@@ -24,6 +24,7 @@ libraryDependencies ++= List(
   compilerPlugin("org.scalamacros"  % ("paradise_" ++ scalaVersion.value) % "2.0.1"),
 
   "io.argonaut"                 %% "argonaut"                   % "6.1",
+  "org.tpolecat"                %% "atto-core"                  % "0.4.1",
   "org.tpolecat"                %% "doobie-core"                % "0.2.2",
   "org.tpolecat"                %% "doobie-contrib-h2"          % "0.2.2",
   "com.h2database"              %  "h2"                         % "1.3.170",
@@ -38,7 +39,8 @@ libraryDependencies ++= List(
   "oncue.knobs"                 %% "core"                       % "3.1.4",
   "oncue.journal"               %% "core"                       % "2.1.1",
   "org.scalaz"                  %% "scalaz-core"                % scalazVersion,
-  "org.scalaz"                  %% "scalaz-concurrent"          % scalazVersion
+  "org.scalaz"                  %% "scalaz-concurrent"          % scalazVersion,
+  "org.scalaz.stream"           %% "scalaz-stream"              % "0.7.1a"
 )
 
 scalacOptions ++= List(

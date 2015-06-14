@@ -38,7 +38,8 @@ licensed under BSD-style licenses - see: http://opensource.org/licenses/BSD-3-Cl
 Kiama, used by scala-optparse-applicative, is licensed under GNU Lesser GPL v3,
 available at http://www.gnu.org/licenses/lgpl.html.
 
-Doobie and Monocle are licensed under the MIT license, available at http://opensource.org/licenses/MIT.
+Atto, Doobie, Monocle, and scalaz-stream are licensed under the MIT license, available
+at http://opensource.org/licenses/MIT.
 
 Http4s, Journal, and Knobs are licensed under Apache License 2.0, reproduced below.
 
