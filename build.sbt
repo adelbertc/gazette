@@ -26,6 +26,7 @@ libraryDependencies ++= List(
   "com.h2database"  %  "h2"                 % "1.3.170",
   http4sProject("argonaut"),
   http4sProject("blazeserver"),
+  http4sProject("blazeclient"),
   http4sProject("dsl"),
   http4sProject("server"),
   "org.scalaz"      %% "scalaz-core"        % scalazVersion,
@@ -48,3 +49,21 @@ scalacOptions ++= List(
   "-Ywarn-numeric-widen",
   "-Ywarn-value-discard"
 )
+
+initialCommands :=
+  """
+  import gazette._
+  import gazette.GazetteClient._
+
+  import java.sql.Date
+
+  import org.http4s.Uri.IPv4
+
+  val uri = uriFromInfo(GazetteServerInfo(IPv4("127.0.0.1"), 8080))
+  val todo1 = Todo("drive", "work", None, List("important"))
+  val todo2 = Todo("leave", "work", None, List("important"))
+  val todo3 = Todo("lunch", "personal", Some(Date.valueOf("2015-06-13")), List("food"))
+  val todo4 = Todo("movies", "social", Some(Date.valueOf("2015-06-11")), List("film"))
+
+  val allTodos = List(todo1, todo2, todo3, todo4)
+  """
