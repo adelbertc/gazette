@@ -25,8 +25,8 @@ libraryDependencies ++= List(
 
   "io.argonaut"                 %% "argonaut"                   % "6.1",
   "org.tpolecat"                %% "atto-core"                  % "0.4.1",
-  "org.tpolecat"                %% "doobie-core"                % "0.2.2",
-  "org.tpolecat"                %% "doobie-contrib-h2"          % "0.2.2",
+  "org.tpolecat"                %% "doobie-core"                % doobieVersion,
+  "org.tpolecat"                %% "doobie-contrib-h2"          % doobieVersion,
   "com.h2database"              %  "h2"                         % "1.3.170",
   http4sProject("argonaut"),
   http4sProject("blazeserver"),
