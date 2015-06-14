@@ -66,4 +66,6 @@ object Client {
   def due(date: Date): GazetteAction[List[Todo]] = jsonQuery(("due", date.toString))
 
   def tag(tag: String): GazetteAction[List[Todo]] = jsonQuery(("tag", tag))
+
+  def stats: GazetteAction[Stats] = jsonAction(Lenses.uriPath.modify(_ ++ "/stats"))
 }

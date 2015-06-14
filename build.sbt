@@ -42,7 +42,8 @@ libraryDependencies ++= List(
   "org.scalaz"                  %% "scalaz-concurrent"          % scalazVersion,
   "org.scalaz.stream"           %% "scalaz-stream"              % "0.7.1a",
   "org.scodec"                  %% "scodec-core"                % "1.7.0"         exclude("com.chuusai", "shapeless_2.10.4"),
-  "org.scodec"                  %% "scodec-stream"              % "0.7.0"
+  "org.scodec"                  %% "scodec-stream"              % "0.7.0",
+  "org.spire-math"              %% "spire"                      % "0.10.1"
 )
 
 scalacOptions ++= List(

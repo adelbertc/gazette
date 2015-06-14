@@ -24,6 +24,8 @@ import scalaz.concurrent.Task
 object Server extends TaskApp {
   val log = Logger[Server.type]
 
+  def statistics: ConnectionIO[Stats] = selectAll.map(Stats.fromTodos)
+
   val transactor: Task[Transactor[Task]] = H2Transactor[Task]("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "sa", "")
 
   def transact[A](action: ConnectionIO[A]): Task[A] =
@@ -116,6 +118,7 @@ object Server extends TaskApp {
         }
       }
 
+    case GET -> Root / "todo" / "stats" => Ok(transact(statistics).map(_.asJson.nospaces))
   }
 
   def parseConfig(config: Config): ValidationNel[String, (String, Int)] =
