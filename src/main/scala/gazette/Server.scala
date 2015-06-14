@@ -8,6 +8,8 @@ import doobie.imports.{ConnectionIO, Transactor, toMoreConnectionIOOps, toSqlInt
 
 import java.sql.Date
 
+import journal._
+
 import org.http4s.{Response, UrlForm}
 import org.http4s.dsl.{->, /, BadRequest, BadRequestSyntax, GET, Ok, OkSyntax, POST, Root}
 import org.http4s.server.blaze.BlazeBuilder
@@ -18,6 +20,8 @@ import scalaz.Scalaz._
 import scalaz.concurrent.Task
 
 object Server extends TaskApp {
+  val log = Logger[Server.type]
+
   val transactor: Task[Transactor[Task]] = H2Transactor[Task]("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "sa", "")
 
   def transact[A](action: ConnectionIO[A]): Task[A] =
@@ -33,22 +37,35 @@ object Server extends TaskApp {
     )
     """.update.run.void
 
+  def logBracket[M[_] : Applicative, A](before: String, after: String)(action: M[A]): M[A] =
+    Applicative[M].point(log.info(before)) *> action <* Applicative[M].point(log.info(after))
+
   def insertTodo(todo: Todo): ConnectionIO[Unit] =
-    sql"""
-    INSERT INTO todo (event, category, due, tags) VALUES (${todo.event}, ${todo.category}, ${todo.due}, ${todo.tags})
-    """.update.run.void
+    logBracket(s"Inserting ${todo}..", s"${todo} inserted.") {
+      sql"""
+      INSERT INTO todo (event, category, due, tags) VALUES (${todo.event}, ${todo.category}, ${todo.due}, ${todo.tags})
+      """.update.run.void
+    }
 
   def selectAll: ConnectionIO[List[Todo]] =
-    sql"SELECT event, category, due, tags FROM todo".query[Todo].list
+    logBracket("Fetching all table rows..", "All rows fetched.") {
+      sql"SELECT event, category, due, tags FROM todo".query[Todo].list
+    }
 
   def inCategory(cat: String): ConnectionIO[List[Todo]] =
-    sql"SELECT event, category, due, tags FROM todo WHERE category = ${cat}".query[Todo].list
+    logBracket(s"Fetching to-dos for category ${cat}..", s"To-dos in category ${cat} fetched.") {
+      sql"SELECT event, category, due, tags FROM todo WHERE category = ${cat}".query[Todo].list
+    }
 
   def due(date: Date): ConnectionIO[List[Todo]] =
-    sql"SELECT event, category, due, tags FROM todo WHERE due = ${date}".query[Todo].list
+    logBracket(s"Fetching to-dos due on ${date}..", s"To-dos due on ${date} fetched.") {
+      sql"SELECT event, category, due, tags FROM todo WHERE due = ${date}".query[Todo].list
+    }
 
   def inTag(tag: String): ConnectionIO[List[Todo]] =
-    sql"SELECT event, category, due, tags FROM todo WHERE ARRAY_CONTAINS(tags, ${tag})".query[Todo].list
+    logBracket(s"Fetching to-dos with tag ${tag}..", s"To-dos with tag ${tag} fetched.") {
+      sql"SELECT event, category, due, tags FROM todo WHERE ARRAY_CONTAINS(tags, ${tag})".query[Todo].list
+    }
 
   def parseForm(map: Map[String, Seq[String]]): ValidationNel[String, Todo] = {
     val event = map.get("event").flatMap(_.headOption).toSuccess(NonEmptyList("event"))
@@ -102,7 +119,9 @@ object Server extends TaskApp {
   override def runc: Task[Unit] =
     for {
       xa <- transactor
+      _  <- Task.delay(log.info("Creating table.."))
       _  <- createTable.transact(xa)
+      _  <- Task.delay(log.info("Table created."))
       _  <- Task.delay(BlazeBuilder.bindHttp(8080).mountService(service, "/gazette").run.awaitShutdown())
     } yield ()
 }

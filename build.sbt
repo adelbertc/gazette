@@ -31,6 +31,7 @@ libraryDependencies ++= List(
   http4sProject("dsl"),
   http4sProject("server"),
   "net.bmjames"     %% "scala-optparse-applicative" % "0.2.1",
+  "oncue.journal"   %% "core"                       % "2.1.1",
   "org.scalaz"      %% "scalaz-core"                % scalazVersion,
   "org.scalaz"      %% "scalaz-concurrent"          % scalazVersion
 )
