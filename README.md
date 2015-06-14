@@ -9,7 +9,7 @@ Gazette is a to-do list service.
 2. `sbt run-main gazette.Server`
 
 ### Cli
-1. `sbt run-main gazette.Cli --host <HOST HERE, e.g. 127.0.0.1> --port <PORT HERE, e.g. 8080>
+1. `sbt run-main gazette.Cli --host [HOST HERE, e.g. 127.0.0.1] --port [PORT HERE, e.g. 8080]`
 
 `sbt run-main gazette.Cli --help` for help.
 
