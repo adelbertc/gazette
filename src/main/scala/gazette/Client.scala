@@ -13,14 +13,14 @@ import scalaz.concurrent.Task
 import scalaz.std.list._
 import scalaz.syntax.traverse._
 
-final case class GazetteServerInfo(address: Host, port: Int)
+final case class ServerInfo(address: Host, port: Int)
 
 final case class GazetteError(error: Response) extends Exception
 
-object GazetteClient {
+object Client {
   type GazetteAction[A] = Kleisli[Task, Uri, A]
 
-  def uriFromInfo(info: GazetteServerInfo): Uri = uriWith(info.address, info.port)
+  def uriFromInfo(info: ServerInfo): Uri = uriWith(info.address, info.port)
 
   def uriWith(address: Host, port: Int): Uri =
     Uri(authority = Some(Authority(host = address, port = Some(port))), path = "/gazette/todo")

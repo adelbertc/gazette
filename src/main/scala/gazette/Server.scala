@@ -19,7 +19,7 @@ import scalaz._
 import scalaz.Scalaz._
 import scalaz.concurrent.Task
 
-object GazetteServer extends TaskApp {
+object Server extends TaskApp {
   val transactor: Task[Transactor[Task]] = H2Transactor[Task]("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "sa", "")
 
   def transact[A](action: ConnectionIO[A]): Task[A] =
