@@ -3,6 +3,7 @@ package gazette
 import java.sql.Date
 
 import gazette.Client.GazetteAction
+import gazette.IO._
 import gazette.Util._
 
 import net.bmjames.opts._

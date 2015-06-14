@@ -4,8 +4,12 @@ Toy project serving to illustrate that it's possible to write pure functional sy
 Gazette is a to-do list service.
 
 ## Usage
+### Database
+1. Check/change the DB values in `src/main/resources/server.cfg`.
+2. `sbt run-main gazette.Database`
+
 ### Server
-1. Check/change the values in `src/main/resources/server.cfg`.
+1. Check/change the server values in `src/main/resources/server.cfg`.
 2. `sbt run-main gazette.Server`
 
 ### Cli
