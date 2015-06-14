@@ -8,7 +8,9 @@ import doobie.imports.{ConnectionIO, Transactor, toMoreConnectionIOOps, toSqlInt
 
 import java.sql.Date
 
-import journal._
+import journal.Logger
+
+import knobs.{ClassPathResource, Config, loadImmutable}
 
 import org.http4s.{Response, UrlForm}
 import org.http4s.dsl.{->, /, BadRequest, BadRequestSyntax, GET, Ok, OkSyntax, POST, Root}
@@ -116,12 +118,26 @@ object Server extends TaskApp {
 
   }
 
-  override def runc: Task[Unit] =
+  def parseConfig(config: Config): ValidationNel[String, (String, Int)] =
+    Apply[({type l[a] = ValidationNel[String, a]})#l].tuple2(config.lookup[String]("host").toSuccess(NonEmptyList("host")),
+                                                             config.lookup[Int]("port").toSuccess(NonEmptyList("port")))
+
+  override def runc: Task[Unit] = {
+    val configPath = "server.cfg"
+
     for {
+      _  <- Task.delay(log.info(s"Loading config from ${configPath}.."))
+      cf <- loadImmutable(List(ClassPathResource(configPath).required))
+      _  <- Task.delay(log.info(s"Config loaded, parsing config.."))
+      t  <- parseConfig(cf).fold(es => Task.fail(MissingConfig(es)), t => Task.now(t))
+      _  <- Task.delay(log.info(s"Config parsed."))
       xa <- transactor
       _  <- Task.delay(log.info("Creating table.."))
       _  <- createTable.transact(xa)
       _  <- Task.delay(log.info("Table created."))
-      _  <- Task.delay(BlazeBuilder.bindHttp(8080).mountService(service, "/gazette").run.awaitShutdown())
+      _  <- Task.delay(BlazeBuilder.bindHttp(host = t._1, port = t._2).mountService(service, "/gazette").run.awaitShutdown())
     } yield ()
+  }
 }
+
+final case class MissingConfig(missing: NonEmptyList[String]) extends Exception
