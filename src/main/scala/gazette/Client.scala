@@ -38,7 +38,7 @@ object Client {
     }
 
   private def jsonQuery[A : EntityDecoder](queryParam: (String, String)): GazetteAction[A] =
-    jsonAction(_.copy(query = Query.fromPairs(queryParam)))
+    jsonAction(Lenses.uriQuery.set(Query.fromPairs(queryParam)))
 
   def insert(todo: Todo): GazetteAction[Todo] =
     Kleisli { uri =>
@@ -61,7 +61,7 @@ object Client {
 
   def category(cat: String): GazetteAction[List[Todo]] = jsonQuery(("category", cat))
 
-  def today: GazetteAction[List[Todo]] = jsonAction(uri => uri.copy(path = uri.path ++ "/today"))
+  def today: GazetteAction[List[Todo]] = jsonAction(Lenses.uriPath.modify(_ ++ "/today"))
 
   def due(date: Date): GazetteAction[List[Todo]] = jsonQuery(("due", date.toString))
 

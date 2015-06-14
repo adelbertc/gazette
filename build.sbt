@@ -16,25 +16,29 @@ val doobieVersion = "0.2.2"
 def http4sProject(project: String) =
   "org.http4s" %% s"http4s-${project}" % "0.7.0" exclude("com.chuusai", "shapeless_2.10.4")
 
+val monocleVersion = "1.1.1"
+
 val scalazVersion = "7.1.2"
 
 libraryDependencies ++= List(
   compilerPlugin("org.scalamacros"  % ("paradise_" ++ scalaVersion.value) % "2.0.1"),
 
-  "io.argonaut"     %% "argonaut"                   % "6.1",
-  "org.tpolecat"    %% "doobie-core"                % "0.2.2",
-  "org.tpolecat"    %% "doobie-contrib-h2"          % "0.2.2",
-  "com.h2database"  %  "h2"                         % "1.3.170",
+  "io.argonaut"                 %% "argonaut"                   % "6.1",
+  "org.tpolecat"                %% "doobie-core"                % "0.2.2",
+  "org.tpolecat"                %% "doobie-contrib-h2"          % "0.2.2",
+  "com.h2database"              %  "h2"                         % "1.3.170",
   http4sProject("argonaut"),
   http4sProject("blazeserver"),
   http4sProject("blazeclient"),
   http4sProject("dsl"),
   http4sProject("server"),
-  "net.bmjames"     %% "scala-optparse-applicative" % "0.2.1",
-  "oncue.knobs"     %% "core"                       % "3.1.4",
-  "oncue.journal"   %% "core"                       % "2.1.1",
-  "org.scalaz"      %% "scalaz-core"                % scalazVersion,
-  "org.scalaz"      %% "scalaz-concurrent"          % scalazVersion
+  "com.github.julien-truffaut"  %%  "monocle-core"              % monocleVersion,
+  "com.github.julien-truffaut"  %%  "monocle-macro"             % monocleVersion,
+  "net.bmjames"                 %% "scala-optparse-applicative" % "0.2.1",
+  "oncue.knobs"                 %% "core"                       % "3.1.4",
+  "oncue.journal"               %% "core"                       % "2.1.1",
+  "org.scalaz"                  %% "scalaz-core"                % scalazVersion,
+  "org.scalaz"                  %% "scalaz-concurrent"          % scalazVersion
 )
 
 scalacOptions ++= List(
@@ -57,13 +61,13 @@ scalacOptions ++= List(
 initialCommands :=
   """
   import gazette._
-  import gazette.GazetteClient._
+  import gazette.Client._
 
   import java.sql.Date
 
   import org.http4s.Uri.IPv4
 
-  val uri = uriFromInfo(GazetteServerInfo(IPv4("127.0.0.1"), 8080))
+  val uri = uriFromInfo(ServerInfo(IPv4("127.0.0.1"), 8080))
   val todo1 = Todo("drive", "work", None, List("important"))
   val todo2 = Todo("leave", "work", None, List("important"))
   val todo3 = Todo("lunch", "personal", Some(Date.valueOf("2015-06-13")), List("food"))
