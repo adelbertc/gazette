@@ -7,8 +7,6 @@ import doobie.contrib.h2.h2types.unliftedStringArrayType
 import doobie.imports.{ConnectionIO, Transactor, toMoreConnectionIOOps, toSqlInterpolator}
 
 import java.sql.Date
-import java.text.SimpleDateFormat
-import java.util.Calendar
 
 import org.http4s.{Response, UrlForm}
 import org.http4s.dsl.{->, /, BadRequest, BadRequestSyntax, GET, Ok, OkSyntax, POST, Root}
@@ -63,15 +61,9 @@ object Server extends TaskApp {
   def category(params: Map[String, String]): Option[Task[List[Todo]]] =
     params.get("category").map(cat => transact(inCategory(cat)))
 
-  def currentDate: Task[Date] =
-    Task.delay {
-      val format = new SimpleDateFormat("yyyy-MM-dd")
-      Date.valueOf(format.format(Calendar.getInstance().getTime()))
-    }
-
   def today: Task[List[Todo]] =
     for {
-      date <- currentDate
+      date <- Util.currentDate
       rs   <- transact(due(date))
     } yield rs
 

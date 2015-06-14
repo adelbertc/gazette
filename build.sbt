@@ -5,9 +5,10 @@ scalaVersion := "2.10.5"
 licenses += ("BSD 2-Clause", url("http://opensource.org/licenses/BSD-2-Clause"))
 
 resolvers ++= List(
-  "oncue"     at "http://dl.bintray.com/oncue/releases",
-  "scalaz"    at "http://dl.bintray.com/scalaz/releases",
-  "tpolecat"  at "http://dl.bintray.com/tpolecat/maven"
+  "bmjames"   at "https://dl.bintray.com/bmjames/maven",
+  "oncue"     at "https://dl.bintray.com/oncue/releases",
+  "scalaz"    at "https://dl.bintray.com/scalaz/releases",
+  "tpolecat"  at "https://dl.bintray.com/tpolecat/maven"
 )
 
 val doobieVersion = "0.2.2"
@@ -20,17 +21,18 @@ val scalazVersion = "7.1.2"
 libraryDependencies ++= List(
   compilerPlugin("org.scalamacros"  % ("paradise_" ++ scalaVersion.value) % "2.0.1"),
 
-  "io.argonaut"     %% "argonaut"           % "6.1",
-  "org.tpolecat"    %% "doobie-core"        % "0.2.2",
-  "org.tpolecat"    %% "doobie-contrib-h2"  % "0.2.2",
-  "com.h2database"  %  "h2"                 % "1.3.170",
+  "io.argonaut"     %% "argonaut"                   % "6.1",
+  "org.tpolecat"    %% "doobie-core"                % "0.2.2",
+  "org.tpolecat"    %% "doobie-contrib-h2"          % "0.2.2",
+  "com.h2database"  %  "h2"                         % "1.3.170",
   http4sProject("argonaut"),
   http4sProject("blazeserver"),
   http4sProject("blazeclient"),
   http4sProject("dsl"),
   http4sProject("server"),
-  "org.scalaz"      %% "scalaz-core"        % scalazVersion,
-  "org.scalaz"      %% "scalaz-concurrent"  % scalazVersion
+  "net.bmjames"     %% "scala-optparse-applicative" % "0.2.1",
+  "org.scalaz"      %% "scalaz-core"                % scalazVersion,
+  "org.scalaz"      %% "scalaz-concurrent"          % scalazVersion
 )
 
 scalacOptions ++= List(
