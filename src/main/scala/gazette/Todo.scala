@@ -36,16 +36,8 @@ object Todo {
     Attempt.fromOption(Some((todo.event, todo.category, todo.due.fold("")(_.toString), todo.tags.mkString(","))),
                        Err(s"Strange error, encoding a Todo should always work."))
 
-  private def flatten[A, B, C, D](t: ((((A, B), C), D))): (A, B, C, D) =
-    (t._1._1._1, t._1._1._2, t._1._2, t._2)
-
-  private def nest[A, B, C, D](t: (A, B, C, D)): ((((A, B), C), D)) =
-    (((t._1, t._2), t._3), t._4)
-
   def todoCodec: Codec[Todo] = {
     val str = variableSizeBits(uint16, utf8)
-    val rawTodoCodec =
-      (str ~ str ~ str ~ str).xmap(flatten[String, String, String, String], nest[String, String, String, String])
-    rawTodoCodec.exmap(todoFromTuple, todoToTuple)
+    (str ~~ str ~~ str ~~ str).exmap(todoFromTuple, todoToTuple)
   }
 }
