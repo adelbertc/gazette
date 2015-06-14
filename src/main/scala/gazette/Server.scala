@@ -72,6 +72,14 @@ object Server extends TaskApp {
       }
 
     case GET -> Root / "todo" / "stats" => Ok(transact(statistics).map(_.asJson.nospaces))
+
+    case req @ POST -> Root / "todo" / "finish" =>
+      req.decode[UrlForm] { data =>
+        parseForm(data.values) match {
+          case Success(td) => Ok(transact(finish(td)) *> Task.now(td.asJson.nospaces))
+          case Failure(er) => BadRequest(s"Missing required fields: ${er.shows}")
+        }
+      }
   }
 
   def parseConfig(config: Config): ValidationNel[String, (String, Int)] =

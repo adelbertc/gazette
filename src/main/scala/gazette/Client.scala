@@ -40,22 +40,26 @@ object Client {
   private def jsonQuery[A : EntityDecoder](queryParam: (String, String)): GazetteAction[A] =
     jsonAction(Lenses.uriQuery.set(Query.fromPairs(queryParam)))
 
-  def insert(todo: Todo): GazetteAction[Todo] =
+  private def jsonPost[A : EntityDecoder](form: Map[String, List[String]], f: Uri => Uri): GazetteAction[A] =
     Kleisli { uri =>
-      val form = Map(("event", List(todo.event)), ("category", List(todo.category)), ("tags", todo.tags)) ++
-                 todo.due.toList.map(date => ("due", List(date.toString))).toMap
-
-      val request = Request(method = Method.POST, uri = uri).withBody(UrlForm(form))
+      val request = Request(method = Method.POST, uri = f(uri)).withBody(UrlForm(form))
 
       defaultClient(request).flatMap {
-        case Successful(resp) => resp.as[Todo]
+        case Successful(resp) => resp.as[A]
         case err              => Task.fail(GazetteError(err))
       }
     }
 
-  def insertList(todos: List[Todo]): GazetteAction[List[Todo]] = todos.traverse(insert)
+  private def todoToForm(todo: Todo): Map[String, List[String]] =
+    Map(("event", List(todo.event)), ("category", List(todo.category)), ("tags", todo.tags)) ++
+    todo.due.toList.map(date => ("due", List(date.toString))).toMap
 
-  def insertMany(todos: Todo*): GazetteAction[List[Todo]] = insertList(todos.toList)
+  def insert(todo: Todo): GazetteAction[Unit] =
+    jsonPost[Todo](todoToForm(todo), identity).void
+
+  def insertList(todos: List[Todo]): GazetteAction[Unit] = todos.traverse_(insert)
+
+  def insertMany(todos: Todo*): GazetteAction[Unit] = insertList(todos.toList)
 
   def todo: GazetteAction[List[Todo]] = jsonAction(identity)
 
@@ -68,4 +72,7 @@ object Client {
   def tag(tag: String): GazetteAction[List[Todo]] = jsonQuery(("tag", tag))
 
   def stats: GazetteAction[Stats] = jsonAction(Lenses.uriPath.modify(_ ++ "/stats"))
+
+  def finish(todo: Todo): GazetteAction[Unit] =
+    jsonPost[Todo](todoToForm(todo), Lenses.uriPath.modify(_ ++ "/finish")).void
 }

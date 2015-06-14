@@ -9,6 +9,8 @@ import net.bmjames.opts._
 
 import org.http4s.Uri
 
+import monocle.std.list.listIndex
+
 import scalaz.{Applicative, Bind}
 import scalaz.concurrent.Task
 import scalaz.std.string.parseInt
@@ -33,6 +35,7 @@ object Cli extends TaskApp {
     4. Due today
     5. Due on ..
     6. Fetch tag
+    7. Finish to-do
     0. Exit
     """
 
@@ -57,15 +60,21 @@ object Cli extends TaskApp {
 
   def prettyList(tds: List[Todo]): String = {
     val bar = " | "
+
+    val size = tds.size.toString.size + 1
+    val sizePad = (" " * size) ++ bar
+
+    def index(i: Int): String = i.toString ++ (" " * (size - i.toString.size)) ++ bar
+
     val header = List("Event", "Category", "Due", "Tags").map(s => s ++ (" " * (maxWidth - s.size))).mkString(bar)
     val sep = "-" * header.size
 
-    header ++ "\n" ++
+    sizePad ++ header ++ "\n" ++
     sep ++ "\n" ++
-    tds.map { todo =>
+    tds.zipWithIndex.map { case (t, i) => (t, i  + 1) }.map { case (todo, i) =>
       val dueDate = todo.due.fold(" " * maxWidth)(date => mangle(date.toString))
       val tagsString = todo.tags.mkString(",")
-      List(mangle(todo.event), mangle(todo.category), dueDate, mangle(tagsString)).mkString(bar)
+      index(i) ++ List(mangle(todo.event), mangle(todo.category), dueDate, mangle(tagsString)).mkString(bar)
     }.mkString("\n")
   }
 
@@ -98,6 +107,18 @@ object Cli extends TaskApp {
         for {
           t <- gprompt("Tag")
           _ <- runAndPrint(Client.tag(t))
+        } yield ()
+      case 7 =>
+        for {
+          tds <-  Client.todo
+          _   <-  gputStrLn(prettyList(tds))
+          rn  <-  gprompt("Number")
+          _   <-  parseInt(rn).toOption.fold(gputStrLn("Invalid number.")) { i =>
+                    val actualIndex = i - 1
+                    listIndex.index(actualIndex).getOption(tds).fold(gputStrLn("Number out of range.")) { todo =>
+                      Client.finish(todo)
+                    }
+                  }
         } yield ()
       case 0 => gputStrLn("Goodbye..") *> Applicative[GazetteAction].point(sys.exit(0))
       case _ => gputStrLn("Bad input, try again.")

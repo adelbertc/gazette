@@ -28,7 +28,8 @@ object Database {
       event     VARCHAR NOT NULL,
       category  VARCHAR NOT NULL,
       due       DATE,
-      tags      ARRAY
+      tags      ARRAY,
+      PRIMARY KEY(event, category)
     )
     """.update.run.void
 
@@ -57,6 +58,15 @@ object Database {
   def inTag(tag: String): ConnectionIO[List[Todo]] =
     logBracket(s"Fetching to-dos with tag ${tag}..", s"To-dos with tag ${tag} fetched.") {
       sql"SELECT event, category, due, tags FROM todo WHERE ARRAY_CONTAINS(tags, ${tag})".query[Todo].list
+    }
+
+  def finish(todo: Todo): ConnectionIO[Unit] =
+    logBracket(s"Removing to-do ${todo}..", s"To-do ${todo} removed.") {
+      sql"""
+      DELETE FROM todo WHERE
+      event = ${todo.event} AND
+      category = ${todo.category}
+      """.update.run.void
     }
 
   def logBracket[M[_] : Applicative, A](before: String, after: String)(action: M[A]): M[A] =
