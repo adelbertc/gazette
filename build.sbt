@@ -1,10 +1,10 @@
-name := "gazette"
+name in ThisBuild := "gazette"
 
-scalaVersion := "2.10.5"
+scalaVersion in ThisBuild := "2.10.5"
 
-licenses += ("BSD 2-Clause", url("http://opensource.org/licenses/BSD-2-Clause"))
+licenses in ThisBuild += ("BSD 2-Clause", url("http://opensource.org/licenses/BSD-2-Clause"))
 
-resolvers ++= List(
+resolvers in ThisBuild ++= List(
   "bmjames"   at "https://dl.bintray.com/bmjames/maven",
   "oncue"     at "https://dl.bintray.com/oncue/releases",
   "scalaz"    at "https://dl.bintray.com/scalaz/releases",
@@ -20,7 +20,7 @@ val monocleVersion = "1.1.1"
 
 val scalazVersion = "7.1.2"
 
-libraryDependencies ++= List(
+libraryDependencies in ThisBuild ++= List(
   compilerPlugin("org.scalamacros"  % ("paradise_" ++ scalaVersion.value) % "2.0.1"),
 
   "io.argonaut"                 %% "argonaut"                   % "6.1",
@@ -38,6 +38,7 @@ libraryDependencies ++= List(
   "net.bmjames"                 %% "scala-optparse-applicative" % "0.2.1",
   "oncue.knobs"                 %% "core"                       % "3.1.4",
   "oncue.journal"               %% "core"                       % "2.1.1",
+  "oncue"                       %% "remotely-core"              % "1.3.0"         exclude("com.chuusai", "shapeless_2.10.4"),
   "org.scalaz"                  %% "scalaz-core"                % scalazVersion,
   "org.scalaz"                  %% "scalaz-concurrent"          % scalazVersion,
   "org.scalaz.stream"           %% "scalaz-stream"              % "0.7.1a",
@@ -46,7 +47,7 @@ libraryDependencies ++= List(
   "org.spire-math"              %% "spire"                      % "0.10.1"
 )
 
-scalacOptions ++= List(
+scalacOptions in ThisBuild ++= List(
   "-deprecation",
   "-encoding", "UTF-8",
   "-feature",
@@ -62,6 +63,10 @@ scalacOptions ++= List(
   "-Ywarn-numeric-widen",
   "-Ywarn-value-discard"
 )
+
+lazy val protocol = project.in(file("protocol"))
+
+lazy val core = project.in(file("core")).dependsOn(protocol)
 
 initialCommands :=
   """

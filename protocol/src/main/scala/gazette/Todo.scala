@@ -3,6 +3,8 @@ package gazette
 import argonaut.{CodecJson, DecodeJson, EncodeJson, Json}
 import argonaut.Argonaut._
 
+import gazette.Util.stringCodec
+
 import java.sql.Date
 
 import org.http4s.EntityDecoder
@@ -10,6 +12,8 @@ import org.http4s.argonaut.jsonOf
 
 import scodec.{Attempt, Codec, Err}
 import scodec.codecs.{uint16, utf8, variableSizeBits}
+
+import scalaz.Disjunction
 
 final case class Todo(event: String, category: String, due: Option[Date], tags: List[String])
 
@@ -36,8 +40,7 @@ object Todo {
     Attempt.fromOption(Some((todo.event, todo.category, todo.due.fold("")(_.toString), todo.tags.mkString(","))),
                        Err(s"Strange error, encoding a Todo should always work."))
 
-  def todoCodec: Codec[Todo] = {
-    val str = variableSizeBits(uint16, utf8)
-    (str ~~ str ~~ str ~~ str).exmap(todoFromTuple, todoToTuple)
-  }
+
+  implicit val todoCodec: Codec[Todo] =
+    (stringCodec ~~ stringCodec ~~ stringCodec ~~ stringCodec).exmap(todoFromTuple, todoToTuple)
 }

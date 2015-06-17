@@ -10,17 +10,12 @@ import scalaz.{Applicative, Disjunction}
 import scalaz.concurrent.Task
 import scalaz.syntax.apply._
 
-object Util {
+object IO {
   def currentDate: Task[Date] =
     Task.delay {
       val format = new SimpleDateFormat("yyyy-MM-dd")
       Date.valueOf(format.format(Calendar.getInstance().getTime()))
     }
-
-  def parseDate(s: String): Option[Date] = Disjunction.fromTryCatchNonFatal(Date.valueOf(s)).toOption
-
-  def parseCsv(s: String): List[String] =
-    s.split(",").toList.map(_.trim).filter(_.nonEmpty)
 
   def putStr(s: String): Task[Unit] = Task.delay(print(s))
 
